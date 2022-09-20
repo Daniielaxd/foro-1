@@ -25,11 +25,17 @@ export class ApiRestService {
   constructor(private http: HttpClient) { }
   
   setUser(user:User){
+    localStorage.setItem('id', user.id.toString());
+    localStorage.setItem('username', user.username);
+    localStorage.setItem('role', user.role);
     this.user = user;
     this.userObs.next(this.user);
   }
 
   getUser(){
+    this.user.id = parseInt(localStorage.getItem('id') || '0');
+    this.user.username = (localStorage.getItem('username') || '');
+    this.user.role = (localStorage.getItem('role') || '');
     return this.user;
   }
 
@@ -37,4 +43,30 @@ export class ApiRestService {
     return this.http.get<Login>(URL+'/login',
       {params:{username:user, password:pass}});
   }
+
+  //CRUD (create, read, update, delete)
+  getTopics(url:string){
+    if(url == '') url = URL+'/topics';
+    const token = localStorage.getItem('token') || '';
+    return this.http.get<any>(url,{headers:{Authorization:token}});
+  }
+
+  postTopics(topic:any){
+    const token = localStorage.getItem('token') || '';
+    return this.http.post<any>(URL+'/topics',{title:topic.title}, 
+      {headers:{Authorization:token}});
+  }
+
+  putTopics(topic:any){
+    const token = localStorage.getItem('token') || '';
+    return this.http.put<any>(URL+'/topics/'+topic.id,{title:topic.title}, 
+      {headers:{Authorization:token}});
+  }
+
+  deleteTopics(topic:any){
+    const token = localStorage.getItem('token') || '';
+    return this.http.delete<any>(URL+'/topics/'+topic.id, 
+      {headers:{Authorization:token}});
+  }
+
 }
